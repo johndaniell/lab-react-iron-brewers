@@ -1,23 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import beersJSON from "./../assets/beers.json";
-
+import { API_URL } from "../components/Constants";
+import axios from "axios";
 
 function RandomBeersPage() {
   // Mock initial state, to be replaced by data from the Beers API. Store the beer info retrieved from the Beers API in this state variable.
-  const [randomBeer, setRandomBeer] = useState(beersJSON[0]);
+  const [randomBeer, setRandomBeer] = useState();
 
   // React Router hook for navigation. We use it for the back button. You can leave this as it is.
   const navigate = useNavigate();
 
-
-  
-  // TASKS:
-  // 1. Set up an effect hook to make a request for a random beer from the Beers API.
-  // 2. Use axios to make a HTTP request.
-  // 3. Use the response data from the Beers API to update the state variable.
-
-
+  useEffect(() => {
+    async function fetchRandomBeer() {
+      try {
+        const response = await axios.get(`${API_URL}/random`);
+        setRandomBeer(response.data);
+      } catch (error) {
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that is not in the range of 2xx
+          console.error(
+            "Server responded with status code: ",
+            error.response.status
+          );
+          console.error("Response data: ", error.response.data);
+          // Here you can handle the error based on the status code
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("No response received: ", error.request);
+        } else {
+          // Something else happened in setting up the request
+          console.error("Error setting up the request: ", error.message);
+        }
+      }
+    }
+    fetchRandomBeer();
+  }, []);
 
   // The logic and the structure for the page showing the random beer. You can leave this as it is.
   return (
